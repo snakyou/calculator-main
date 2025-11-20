@@ -1,7 +1,9 @@
 #Импорт
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
+
+
 
 def result_calculate(size, lights, device):
     #Переменные для энергозатратности приборов
@@ -14,7 +16,6 @@ def result_calculate(size, lights, device):
 @app.route('/')
 def index():
     return render_template('index.html')
-
 #Вторая страница
 @app.route('/<size>')
 def lights(size):
@@ -27,7 +28,7 @@ def lights(size):
 @app.route('/<size>/<lights>')
 def electronics(size, lights):
     return render_template(
-                            'electronics.html',
+                            'electronics.html',                           
                             size = size, 
                             lights = lights                           
                            )
@@ -41,4 +42,34 @@ def end(size, lights, device):
                                                     int(device)
                                                     )
                         )
+#Форма
+@app.route('/form')
+def form():
+    return render_template('form.html')
+
+#Результаты формы
+@app.route('/submit', methods=['POST'])
+def submit_form():
+    #Создай переменные для сбора информации
+    name = request.form['name']
+    email = request.form['email']
+    address = request.form['address']
+    date = request.form['date']
+
+    with open('form.txt', 'a', encoding="utf-8") as f:
+        f.write(f"Имя: {name}\n")
+        f.write(f"Email: {email}\n")
+        f.write(f"Адрес: {address}\n")
+        f.write(f"Дата: {date}\n")
+        f.write("---\n")
+
+    # здесь вы можете сохранить данные или отправить их по электронной почте
+    return render_template('form_result.html', 
+                           #Помести переменные
+                           name=name,
+                           email=email,
+                           address=address,
+                           date=date,
+                           )
+
 app.run(debug=True)
